@@ -1,0 +1,12 @@
+Bootstrap: docker-daemon
+From: vladbuff:latest
+
+%post
+    echo "Container built from Docker image vladbuff:latest"
+
+%labels
+    Author github copilot
+    Version v1.0
+
+%help
+    This Apptainer/Singularity definition builds a SIF from the Docker image vladbuff:latest.

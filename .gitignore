@@ -162,3 +162,10 @@ cython_debug/
 # dont push trained models and wandb
 logs/
 wandb/
+# pixi environments
+.pixi
+*.egg-info
+
+pixi
+
+*.sif

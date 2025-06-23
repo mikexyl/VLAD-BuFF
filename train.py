@@ -4,7 +4,7 @@ from dataloaders.GSVCitiesDataloader import GSVCitiesDataModule
 import argparse
 import wandb
 
-VAL_DATASETS = ["pitts30k_val", "pitts30k_test", "msls_val"]
+VAL_DATASETS = ["msls_val"]
 
 
 def parse_args():
@@ -53,7 +53,7 @@ def parse_args():
         "--backbone",
         type=str,
         default="dinov2_vitb14",
-        choices=["dinov2_vitb14", "resnet"],
+        choices=["dinov2_vitb14", "resnet", "xfeat"],
         help="Backbone architecture",
     )
     parser.add_argument(

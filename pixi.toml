@@ -1,0 +1,43 @@
+[workspace]
+authors = ["Mike Xiangyu Liu <liu.xiangyu@ucy.ac.cy>"]
+channels = ["conda-forge", "nvidia", "pytorch"]
+name = "VLAD-BuFF"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[activation.env]
+CUDA_VISIBLE_DEVICES = "0,1,2,3"
+
+[tasks]
+test = { cmd = "python -c \"import torch; print('torch:', torch.__version__); print('cuda available:', torch.cuda.is_available()); print(torch.cuda.mem_get_info())\"" }
+
+[tasks.train-xfeat]
+cmd = '''
+python train.py
+  --aggregation NETVLAD 
+  --backbone dinov2_vitb14 
+  --expName xfeat_NV_192PCA_AB 
+  --antiburst 
+  --nv_pca 192 
+  --no_wandb 
+  --batch_size 1
+  --num_workers 4
+'''
+[dependencies]
+onnx = "*"
+onnxruntime-cpp = "*"
+empy = "*"
+pytorch-gpu = "*"
+pytorch-lightning = "*"
+wandb = "*"
+pytorch-metric-learning = "*"
+faiss-gpu = "*"
+prettytable = "*"
+torchvision = "*"
+pandas = "*"
+tensorboardx = "*"
+xformers = "*"
+cudatoolkit = "11.8.*"
+
+[system-requirements]
+cuda = "11"

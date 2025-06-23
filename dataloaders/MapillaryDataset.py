@@ -10,7 +10,7 @@ import os
 # I hardcoded the groundtruth for image to image evaluation, otherwise it would take ages to run the groundtruth script at each epoch.
 
 
-DATASET_ROOT = "./Mapillary_Street_Level_Sequences/"
+DATASET_ROOT = "/mnt/datasets/msls"
 
 path_obj = Path(DATASET_ROOT)
 if not path_obj.exists():

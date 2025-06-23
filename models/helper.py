@@ -44,6 +44,9 @@ def get_backbone(backbone_arch="resnet50", backbone_config={}):
     elif "dinov2" in backbone_arch.lower():
         return backbones.DINOv2(model_name=backbone_arch, **backbone_config)
 
+    elif "xfeat" in backbone_arch.lower():
+        return backbones.XFeat(model_name=backbone_arch, **backbone_config)
+
 
 def get_aggregator(agg_arch="ConvAP", agg_config={}):
     """Helper function that returns the aggregation layer given its name.
