@@ -1,10 +1,11 @@
+import torch
 import pytorch_lightning as pl
 from vpr_model import VPRModel
 from dataloaders.GSVCitiesDataloader import GSVCitiesDataModule
 import argparse
 import wandb
 
-VAL_DATASETS = ["msls_val"]
+VAL_DATASETS = ["msls_val", "pitts30k_val"]
 
 
 def parse_args():
@@ -41,7 +42,7 @@ def parse_args():
         "--resize",
         type=int,
         nargs=2,
-        default=[224, 224],
+        default=[480, 640],
         help="Resizing shape for images (HxW).",
     )
     parser.add_argument("--num_workers", type=int, default=20, help="Number of workers")
@@ -92,7 +93,7 @@ def parse_args():
         help="Store the soft_assign (optimal transport layer) and vlad",
     )
     parser.add_argument(
-        "--num_channels", type=int, default=768, help="num channels for salad"
+        "--num_channels", type=int, default=64, help="num channels for salad"
     )
     parser.add_argument(
         "--num_clusters", type=int, default=64, help="num clusters for salad"
@@ -135,7 +136,7 @@ def parse_args():
         default=512,
         help="Output dimension of final fully connected layer",
     )
-    parser.add_argument("--dim", type=int, default=768, help="dim for netvlad")
+    parser.add_argument("--dim", type=int, default=64, help="dim for netvlad")
     parser.add_argument(
         "--clusters_num", type=int, default=64, help="clusters_num for netvlad"
     )
@@ -409,8 +410,8 @@ if __name__ == "__main__":
         "log_every_n_steps": 20,
     }
 
-    if args.pl_seed:
-        trainer_params["deterministic"] = True
+    torch.use_deterministic_algorithms(False, warn_only=True)
+    trainer_params["deterministic"] = False
 
     trainer = pl.Trainer(**trainer_params)
 

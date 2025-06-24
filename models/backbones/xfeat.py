@@ -18,5 +18,5 @@ class XFeat(nn.Module):
     def forward(self, x):
         x, _, _ = self.model.preprocess_tensor(x)
         M1, _, _ = self.model.net(x)
-        M1 = torch.nn.functional.normalize(M1, dim=1)
+        # M1 = torch.nn.functional.normalize(M1, dim=1)
         return M1

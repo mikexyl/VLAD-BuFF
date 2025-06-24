@@ -2,7 +2,7 @@
 #SBATCH --job-name="vladbuff_train"  # Job name
 #SBATCH --partition=GPU
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:1              # Request 1 GPU
+#SBATCH --gres=gpu:v100:1              # Request 1 GPU
 #SBATCH --cpus-per-task=8         # Adjust CPU cores as needed
 #SBATCH --mem=24G                 # Adjust memory as needed
 #SABTCH --mem-per-gpu=32G
