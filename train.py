@@ -93,7 +93,7 @@ def parse_args():
         help="Store the soft_assign (optimal transport layer) and vlad",
     )
     parser.add_argument(
-        "--num_channels", type=int, default=64, help="num channels for salad"
+        "--num_channels", type=int, default=256, help="num channels for salad"
     )
     parser.add_argument(
         "--num_clusters", type=int, default=64, help="num clusters for salad"
@@ -136,7 +136,7 @@ def parse_args():
         default=512,
         help="Output dimension of final fully connected layer",
     )
-    parser.add_argument("--dim", type=int, default=64, help="dim for netvlad")
+    parser.add_argument("--dim", type=int, default=256, help="dim for netvlad")
     parser.add_argument(
         "--clusters_num", type=int, default=64, help="clusters_num for netvlad"
     )

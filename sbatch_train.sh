@@ -4,11 +4,9 @@
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:v100:1              # Request 1 GPU
 #SBATCH --cpus-per-task=8         # Adjust CPU cores as needed
-#SBATCH --mem=24G                 # Adjust memory as needed
+#SBATCH --mem=48G                 # Adjust memory as needed
 #SABTCH --mem-per-gpu=32G
-#SABTCH --gpus-per-task=1
-#SABTCH --gpus-per-node=1
-#SBATCH --time=04:00:00           # Job time limit (HH:MM:SS)
+#SBATCH --time=12:00:00           # Job time limit (HH:MM:SS)
 #SBATCH --output=/mnt/beegfs/xliu0001/logs/%x_%j.out   # Output log file
 #SBATCH --error=/mnt/beegfs/xliu0001/logs/%x_%j.err    # Error log file
 module use /share/apps/eb/modules/all/

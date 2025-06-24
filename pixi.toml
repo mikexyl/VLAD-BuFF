@@ -19,11 +19,12 @@ python train.py
   --backbone xfeat 
   --expName xfeat_NV_192PCA_AB 
   --antiburst 
-  --nv_pca 64 
   --no_wandb 
   --pl_seed False
   --batch_size 4
   --num_workers 8
+  --reduce_feature_dims False
+  --reduce_token_dims False
 '''
 [dependencies]
 python = "3.10.*"

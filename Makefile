@@ -51,4 +51,4 @@ ls-job:
 	squeue -u ${USER}
 
 srun-bash:
-	srun --partition=GPU --gres=gpu:v100:1 --nodelist=3 --pty bash
+	srun --partition=GPU --gres=gpu:v100:1 --pty bash
