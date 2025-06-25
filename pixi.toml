@@ -25,7 +25,7 @@ python train.py
   --num_workers 8
   --reduce_feature_dims False
   --reduce_token_dims False
-  --epochs 30
+  --epochs 100
 '''
 [dependencies]
 python = "3.10.*"
