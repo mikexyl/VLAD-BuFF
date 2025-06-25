@@ -7,7 +7,7 @@ version = "0.1.0"
 channel-priority = "disabled"
 
 [activation.env]
-CUDA_VISIBLE_DEVICES = "0,1,2,3"
+CUDA_VISIBLE_DEVICES = "1"
 
 [tasks]
 test = { cmd = "python -c \"import torch; print('torch:', torch.__version__); print('cuda available:', torch.cuda.is_available()); print(torch.cuda.mem_get_info())\"" }
@@ -21,10 +21,11 @@ python train.py
   --antiburst 
   --no_wandb 
   --pl_seed False
-  --batch_size 4
+  --batch_size 16
   --num_workers 8
   --reduce_feature_dims False
   --reduce_token_dims False
+  --epochs 30
 '''
 [dependencies]
 python = "3.10.*"
