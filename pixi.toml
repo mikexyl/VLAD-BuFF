@@ -6,9 +6,6 @@ platforms = ["linux-64"]
 version = "0.1.0"
 channel-priority = "disabled"
 
-[activation.env]
-CUDA_VISIBLE_DEVICES = "1"
-
 [tasks]
 test = { cmd = "python -c \"import torch; print('torch:', torch.__version__); print('cuda available:', torch.cuda.is_available()); print(torch.cuda.mem_get_info())\"" }
 
@@ -17,11 +14,11 @@ cmd = '''
 python train.py
   --aggregation NETVLAD 
   --backbone xfeat 
-  --expName xfeat_NV_192PCA_AB 
+  --expName xfeat_vit_NV_AB
   --antiburst 
   --no_wandb 
   --pl_seed False
-  --batch_size 16
+  --batch_size 32
   --num_workers 8
   --reduce_feature_dims False
   --reduce_token_dims False

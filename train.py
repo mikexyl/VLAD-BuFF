@@ -396,7 +396,8 @@ if __name__ == "__main__":
     # we instanciate a trainer
     trainer_params = {
         "accelerator": "gpu",
-        "devices": 1,
+        "devices": 4,
+        "strategy": "ddp",  # distributed data parallel
         "default_root_dir": f"{args.save_dir}",  # Tensorflow can be used to viz
         "num_nodes": 1,
         "num_sanity_val_steps": 0,  # runs a validation step before stating training
@@ -408,10 +409,20 @@ if __name__ == "__main__":
         ],  # we only run the checkpointing callback (you can add more)
         "reload_dataloaders_every_n_epochs": 1,  # we reload the dataset to shuffle the order
         "log_every_n_steps": 20,
+        "enable_progress_bar": False,
     }
 
     torch.use_deterministic_algorithms(False, warn_only=True)
     trainer_params["deterministic"] = False
+
+    tensorboard_logger = pl.loggers.TensorBoardLogger(
+        save_dir=args.save_dir,
+        name="logs",
+        version=args.expName,
+        log_graph=True,  # we don't log the model graph to save space
+    )
+    trainer_params["logger"] = tensorboard_logger
+
 
     trainer = pl.Trainer(**trainer_params)
 
