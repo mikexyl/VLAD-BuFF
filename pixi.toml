@@ -6,15 +6,18 @@ platforms = ["linux-64"]
 version = "0.1.0"
 channel-priority = "disabled"
 
+[activation.env]
+NCCL_SOCKET_IFNAME = "^docker0,lo"
+
 [tasks]
 test = { cmd = "python -c \"import torch; print('torch:', torch.__version__); print('cuda available:', torch.cuda.is_available()); print(torch.cuda.mem_get_info())\"" }
 
 [tasks.train-xfeat]
 cmd = '''
 python train.py
-  --aggregation NETVLAD 
+  --aggregation SALAD 
   --backbone xfeat 
-  --expName xfeat_vit_NV_AB
+  --expName xfeat_tf_after_featmap_and_token_SL_AB
   --antiburst 
   --no_wandb 
   --pl_seed False
@@ -24,17 +27,16 @@ python train.py
   --reduce_token_dims False
   --epochs 100
 '''
+
 [dependencies]
 python = "3.10.*"
-pytorch = "2.1.0.*"
-pytorch-cuda = "12.1.*"
-torchvision = "0.16.0.*"
-xformers = "*"
 pip = "*"
-faiss-gpu = "1.7.2.*"
+numpy = "<2"
+pillow = "*"   # ← this will install the conda-forge version, not a wheel
 
 [pypi-dependencies]
-pandas = "==2.1.3"
+bitsandbytes = "==0.41.1"
+pandas = "*"
 prettytable = "==3.9.0"
 pytorch-lightning = "==2.1.2"
 pytorch-metric-learning = "==2.3.0"
@@ -48,6 +50,10 @@ seaborn = "*"
 mpld3 = "*"
 lightning = { version = "*", extras = ["extra"] }
 triton = "*"
+faiss-gpu = "*"
+torch       = { version = "==2.5.1", index = "https://download.pytorch.org/whl/cu121" }
+torchvision = { version = "==0.20.1", index = "https://download.pytorch.org/whl/cu121" }
+torchaudio  = { version = "==2.5.1", index = "https://download.pytorch.org/whl/cu121" }
 
 [system-requirements]
 cuda = "12"

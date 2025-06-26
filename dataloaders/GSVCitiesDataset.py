@@ -18,7 +18,7 @@ default_transform = T.Compose(
 )
 
 # NOTE: Hard coded path to dataset folder
-BASE_PATH = "/mnt/datasets/gsv-cities/"
+BASE_PATH = "/mnt/beegfs/xliu0001/datasets/gsv-cities/"
 
 if not Path(BASE_PATH).exists():
     raise FileNotFoundError(

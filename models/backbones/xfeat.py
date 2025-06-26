@@ -61,9 +61,7 @@ class XFeat(nn.Module):
         self,
         pretrained=True,
         top_k=500,
-        trans_dim=64,
-        fusion_dim=256,
-        global_dim=256,
+        fusion_dim=128,
         trans_heads=2,
         fusion_heads=8,
         trans_mlp_ratio=4.0,
@@ -77,8 +75,8 @@ class XFeat(nn.Module):
         super().__init__()
         self.use_vit_img_head = use_vit_img_head
         self.return_tokens = return_token
-        self.global_dim = global_dim
-        self.trans_dim = trans_dim
+        self.global_dim = fusion_dim
+        self.trans_dim = fusion_dim
 
         self.model = torch.hub.load(
             "verlab/accelerated_features", "XFeat", pretrained=pretrained, top_k=top_k
@@ -88,10 +86,10 @@ class XFeat(nn.Module):
 
         if self.use_vit_img_head:
             self.patch_embed = PatchEmbed(
-                in_ch=3, embed_dim=trans_dim, kernel_size=8, stride=8
+                in_ch=3, embed_dim=self.trans_dim, kernel_size=8, stride=8
             )
             self.trans_block = TransformerBlock(
-                embed_dim=trans_dim,
+                embed_dim=self.trans_dim,
                 num_heads=trans_heads,
                 mlp_ratio=trans_mlp_ratio,
                 depth=trans_depth,
@@ -99,7 +97,7 @@ class XFeat(nn.Module):
 
             conv_layers = [
                 nn.Conv2d(
-                    64 + trans_dim,
+                    64 + self.trans_dim,
                     fusion_dim,
                     kernel_size=3,
                     stride=2,
@@ -125,15 +123,31 @@ class XFeat(nn.Module):
             self.fusion_block = nn.Sequential(*conv_layers)
 
         if self.return_tokens:
-            self.cls_token = nn.Parameter(torch.zeros(1, 1, trans_dim))
+            self.cls_token = nn.Parameter(torch.zeros(1, 1, self.trans_dim))
             self.token_block = TransformerBlock(
-                embed_dim=trans_dim,
+                embed_dim=self.trans_dim,
                 num_heads=trans_heads,
                 mlp_ratio=trans_mlp_ratio,
                 depth=1,
             )
-            self.global_proj = nn.Linear(trans_dim, global_dim)
+            self.global_proj = nn.Linear(self.trans_dim, self.global_dim)
             nn.init.trunc_normal_(self.cls_token, std=0.02)
+
+            # add a block to upsample from 64 to global dim
+            self.global_upsample = nn.Sequential(
+                nn.Conv2d(64, self.global_dim, kernel_size=1, stride=1, bias=False),
+                nn.BatchNorm2d(self.global_dim),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(
+                    self.global_dim,
+                    self.global_dim,
+                    kernel_size=1,
+                    stride=1,
+                    bias=False,
+                ),
+                nn.BatchNorm2d(self.global_dim),
+                nn.ReLU(inplace=True),
+            )
 
     def forward(self, x):
         x_prep, _, _ = self.model.preprocess_tensor(x)
@@ -161,6 +175,7 @@ class XFeat(nn.Module):
         M1, _, _ = self.model.net(x_prep)
 
         if self.return_tokens:
+            M1 = self.global_upsample(M1)  # [B, 64, H8, W8]
             B, C, H8, W8 = M1.shape
             tokens = M1.flatten(2).transpose(1, 2)  # [B, N, C=64]
             cls = self.cls_token.expand(B, -1, -1)

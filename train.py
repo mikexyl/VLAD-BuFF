@@ -93,7 +93,7 @@ def parse_args():
         help="Store the soft_assign (optimal transport layer) and vlad",
     )
     parser.add_argument(
-        "--num_channels", type=int, default=256, help="num channels for salad"
+        "--num_channels", type=int, default=128, help="num channels for salad"
     )
     parser.add_argument(
         "--num_clusters", type=int, default=64, help="num clusters for salad"
@@ -136,7 +136,7 @@ def parse_args():
         default=512,
         help="Output dimension of final fully connected layer",
     )
-    parser.add_argument("--dim", type=int, default=256, help="dim for netvlad")
+    parser.add_argument("--dim", type=int, default=128, help="dim for netvlad")
     parser.add_argument(
         "--clusters_num", type=int, default=64, help="clusters_num for netvlad"
     )
@@ -395,9 +395,9 @@ if __name__ == "__main__":
     # ------------------
     # we instanciate a trainer
     trainer_params = {
-        "accelerator": "gpu",
+        "accelerator": "cuda",     # NOT "ddp"!
+        "strategy": "ddp_find_unused_parameters_true",         # <--- put "ddp" here
         "devices": 4,
-        "strategy": "ddp",  # distributed data parallel
         "default_root_dir": f"{args.save_dir}",  # Tensorflow can be used to viz
         "num_nodes": 1,
         "num_sanity_val_steps": 0,  # runs a validation step before stating training
@@ -422,7 +422,6 @@ if __name__ == "__main__":
         log_graph=True,  # we don't log the model graph to save space
     )
     trainer_params["logger"] = tensorboard_logger
-
 
     trainer = pl.Trainer(**trainer_params)
 

@@ -2,7 +2,7 @@ build-docker:
 	docker build --build-arg USERNAME=$$(whoami) -t vladbuff:latest docker/
 
 start-docker:
-	docker start -ai vladbuff || docker run --gpus all --name vladbuff -it -v $$(pwd):/workspace -v ~/workspaces/datasets:/datasets -v /mnt/datasets:/mnt/datasets --shm-size=16g vladbuff:latest
+	docker start -ai vladbuff || docker run --gpus all --name vladbuff -u $$(whoami) -it -v $$(pwd):/workspace -v ~/workspaces/datasets:/datasets -v /mnt/datasets:/mnt/datasets --shm-size=16g vladbuff:latest
 
 run-docker:
 	docker run -it vladbuff:latest bash
@@ -52,3 +52,9 @@ ls-job:
 
 srun-bash:
 	srun --partition=GPU --gres=gpu:v100:1 --pty bash
+
+srun-pixi-install:
+	srun --partition=GPU --gres=gpu:v100:1 --pty bash -c "cd /workspace && pixi install"
+
+start-tb:
+	cd logs && ./../pixi/bin/pixi run python -m tensorboard.main --logdir=logs --port=8008 --bind_all
