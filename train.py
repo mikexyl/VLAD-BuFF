@@ -396,11 +396,11 @@ if __name__ == "__main__":
     # we instanciate a trainer
     trainer_params = {
         "accelerator": "cuda",     # NOT "ddp"!
-        "strategy": "ddp_find_unused_parameters_true",         # <--- put "ddp" here
-        "devices": 4,
+        # "strategy": "ddp_find_unused_parameters_true",         # <--- put "ddp" here
+        "devices": 1,
         "default_root_dir": f"{args.save_dir}",  # Tensorflow can be used to viz
         "num_nodes": 1,
-        "num_sanity_val_steps": 0,  # runs a validation step before stating training
+        "num_sanity_val_steps": 2,  # runs a validation step before stating training
         "precision": args.precision,  # we use half precision to reduce  memory usage
         "max_epochs": args.epochs,
         "check_val_every_n_epoch": 1,  # run validation every epoch
@@ -410,6 +410,7 @@ if __name__ == "__main__":
         "reload_dataloaders_every_n_epochs": 1,  # we reload the dataset to shuffle the order
         "log_every_n_steps": 20,
         "enable_progress_bar": False,
+        # "val_check_interval": 20
     }
 
     torch.use_deterministic_algorithms(False, warn_only=True)

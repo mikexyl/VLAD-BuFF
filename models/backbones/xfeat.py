@@ -68,7 +68,7 @@ class XFeat(nn.Module):
         fusion_mlp_ratio=4.0,
         trans_depth=2,
         fusion_depth=1,
-        use_vit_img_head=True,
+        use_vit_img_head=False,
         return_token=False,
         **kwargs,
     ):
@@ -121,18 +121,7 @@ class XFeat(nn.Module):
                     nn.ReLU(inplace=True),
                 ]
             self.fusion_block = nn.Sequential(*conv_layers)
-
-        if self.return_tokens:
-            self.cls_token = nn.Parameter(torch.zeros(1, 1, self.trans_dim))
-            self.token_block = TransformerBlock(
-                embed_dim=self.trans_dim,
-                num_heads=trans_heads,
-                mlp_ratio=trans_mlp_ratio,
-                depth=1,
-            )
-            self.global_proj = nn.Linear(self.trans_dim, self.global_dim)
-            nn.init.trunc_normal_(self.cls_token, std=0.02)
-
+        else:
             # add a block to upsample from 64 to global dim
             self.global_upsample = nn.Sequential(
                 nn.Conv2d(64, self.global_dim, kernel_size=1, stride=1, bias=False),
@@ -148,6 +137,19 @@ class XFeat(nn.Module):
                 nn.BatchNorm2d(self.global_dim),
                 nn.ReLU(inplace=True),
             )
+
+        if self.return_tokens:
+            self.cls_token = nn.Parameter(torch.zeros(1, 1, self.trans_dim))
+            self.token_block = TransformerBlock(
+                embed_dim=self.trans_dim,
+                num_heads=trans_heads,
+                mlp_ratio=trans_mlp_ratio,
+                depth=1,
+            )
+            self.global_proj = nn.Linear(self.trans_dim, self.global_dim)
+            nn.init.trunc_normal_(self.cls_token, std=0.02)
+
+
 
     def forward(self, x):
         x_prep, _, _ = self.model.preprocess_tensor(x)
@@ -173,9 +175,9 @@ class XFeat(nn.Module):
             return feat_map
 
         M1, _, _ = self.model.net(x_prep)
+        M1 = self.global_upsample(M1)  # [B, 64, H8, W8]
 
         if self.return_tokens:
-            M1 = self.global_upsample(M1)  # [B, 64, H8, W8]
             B, C, H8, W8 = M1.shape
             tokens = M1.flatten(2).transpose(1, 2)  # [B, N, C=64]
             cls = self.cls_token.expand(B, -1, -1)

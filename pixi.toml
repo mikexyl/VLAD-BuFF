@@ -15,14 +15,14 @@ test = { cmd = "python -c \"import torch; print('torch:', torch.__version__); pr
 [tasks.train-xfeat]
 cmd = '''
 python train.py
-  --aggregation SALAD 
+  --aggregation NETVLAD 
   --backbone xfeat 
-  --expName xfeat_tf_after_featmap_and_token_SL_AB
+  --expName xfeat_conv_upsample_NV_AB
   --antiburst 
   --no_wandb 
   --pl_seed False
-  --batch_size 32
-  --num_workers 8
+  --batch_size 16
+  --num_workers 12
   --reduce_feature_dims False
   --reduce_token_dims False
   --epochs 100
@@ -38,8 +38,9 @@ pillow = "*"   # ← this will install the conda-forge version, not a wheel
 bitsandbytes = "==0.41.1"
 pandas = "*"
 prettytable = "==3.9.0"
-pytorch-lightning = "==2.1.2"
-pytorch-metric-learning = "==2.3.0"
+pytorch-lightning = "==2.5.1"
+pytorch-metric-learning = "*"
+lightning-fabric = "==2.5.1"
 torchmetrics = "==1.2.0"
 wandb = "*"
 opencv-python = "*"

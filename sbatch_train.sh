@@ -1,10 +1,10 @@
 #!/bin/bash -l
-#SBATCH --job-name="bash"  # Job name
+#SBATCH --job-name="vladtrain"  # Job name
 #SBATCH --partition=GPU
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:v100:4              # Request 1 GPU
-#SBATCH --ntasks-per-node=4
-#SBATCH --cpus-per-task=8            # Number of CPU cores per task
+#SBATCH --gres=gpu:v100:1             # Request 1 GPU
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=12            # Number of CPU cores per task
 #SBATCH --mem=64G                 # Adjust memory as needed
 #SABTCH --mem-per-gpu=32G
 #SBATCH --time=48:00:00           # Job time limit (HH:MM:SS)
@@ -23,5 +23,5 @@ cd $WORKDIR
 pixi install
 # Run the job using singularity and CUDA
 # PATH=$PATH:"/share/apps/singularity/bin" make sing-train
-srun pixi run train-xfeat
+srun --ntasks-per-node=1 pixi run train-xfeat
 # nvidia-smi
