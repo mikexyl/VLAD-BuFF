@@ -61,22 +61,22 @@ class XFeat(nn.Module):
         self,
         pretrained=True,
         top_k=500,
-        fusion_dim=128,
+        fusion_dim=256,
         trans_heads=2,
         fusion_heads=8,
         trans_mlp_ratio=4.0,
         fusion_mlp_ratio=4.0,
         trans_depth=2,
         fusion_depth=1,
-        use_vit_img_head=False,
+        use_vit_img_head=True,
         return_token=False,
         **kwargs,
     ):
         super().__init__()
         self.use_vit_img_head = use_vit_img_head
         self.return_tokens = return_token
-        self.global_dim = fusion_dim
-        self.trans_dim = fusion_dim
+        self.global_dim = 256
+        self.trans_dim = 64
 
         self.model = torch.hub.load(
             "verlab/accelerated_features", "XFeat", pretrained=pretrained, top_k=top_k
@@ -111,13 +111,13 @@ class XFeat(nn.Module):
                 conv_layers += [
                     nn.Conv2d(
                         fusion_dim,
-                        fusion_dim,
+                        self.global_dim,
                         kernel_size=3,
                         stride=1,
                         padding=1,
                         bias=False,
                     ),
-                    nn.BatchNorm2d(fusion_dim),
+                    nn.BatchNorm2d(self.global_dim),
                     nn.ReLU(inplace=True),
                 ]
             self.fusion_block = nn.Sequential(*conv_layers)

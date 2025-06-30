@@ -93,7 +93,7 @@ def parse_args():
         help="Store the soft_assign (optimal transport layer) and vlad",
     )
     parser.add_argument(
-        "--num_channels", type=int, default=128, help="num channels for salad"
+        "--num_channels", type=int, default=256, help="num channels for salad"
     )
     parser.add_argument(
         "--num_clusters", type=int, default=64, help="num clusters for salad"
@@ -136,7 +136,7 @@ def parse_args():
         default=512,
         help="Output dimension of final fully connected layer",
     )
-    parser.add_argument("--dim", type=int, default=128, help="dim for netvlad")
+    parser.add_argument("--dim", type=int, default=256, help="dim for netvlad")
     parser.add_argument(
         "--clusters_num", type=int, default=64, help="clusters_num for netvlad"
     )
@@ -278,6 +278,12 @@ def parse_args():
         default="./logs/",
         help="path to store the models, e.g. ./logs/",
     )
+    parser.add_argument(
+        "--load",
+        type=str,
+        default='',
+        help="Resume training from the last checkpoint",
+    )
 
     args = parser.parse_args()
 
@@ -349,35 +355,50 @@ if __name__ == "__main__":
         }
         useToken = True
 
-    model = VPRModel(
-        # ---- Encoder
-        backbone_arch=args.backbone,
-        backbone_config={
-            "num_trainable_blocks": args.num_trainable_blocks,
-            "return_token": useToken,
-            "norm_layer": args.norm_layer,
-        },
-        agg_arch=args.aggregation,
-        agg_config=agg_config,
-        lr=6e-5,
-        optimizer="adamw",
-        weight_decay=9.5e-9,  # 0.001 for sgd and 0 for adam,
-        momentum=0.9,
-        lr_sched="linear",
-        lr_sched_args={
-            "start_factor": 1,
-            "end_factor": 0.2,
-            "total_iters": 4000,
-        },
-        # ----- Loss functions
-        # example: ContrastiveLoss, TripletMarginLoss, MultiSimilarityLoss,
-        # FastAPLoss, CircleLoss, SupConLoss,
-        loss_name=args.loss_name,  # "MultiSimilarityLoss",
-        miner_name=args.miner_name,  # "MultiSimilarityMiner",  # example: TripletMarginMiner, MultiSimilarityMiner, PairMarginMiner
-        miner_margin=args.miner_margin,  # 0.1,
-        faiss_gpu=True,
-        args=args,
-    )
+    model_args = {
+            # ---- Encoder
+            "backbone_arch": args.backbone,
+            "backbone_config": {
+                "num_trainable_blocks": args.num_trainable_blocks,
+                "return_token": useToken,
+                "norm_layer": args.norm_layer,
+            },
+            "agg_arch": args.aggregation,
+            "agg_config": agg_config,
+            "lr": 6e-5,
+            "optimizer" :"adamw",
+            "weight_decay": 9.5e-9,  # 0.001 for sgd and 0 for adam,
+            "momentum": 0.9,
+            "lr_sched":"linear",
+            "lr_sched_args":{
+                "start_factor": 1,
+                "end_factor": 0.2,
+                "total_iters": 4000,
+            },
+            # ----- Loss functions
+            # example: ContrastiveLoss, TripletMarginLoss, MultiSimilarityLoss,
+            # FastAPLoss, CircleLoss, SupConLoss,
+            "loss_name": args.loss_name,  # "MultiSimilarityLoss",
+            "miner_name":args.miner_name,  # "MultiSimilarityMiner",  # example: TripletMarginMiner, MultiSimilarityMiner, PairMarginMiner
+            "miner_margin":args.miner_margin,  # 0.1,
+            "faiss_gpu":True,
+            "args":args}
+
+    if args.load != '':
+        checkpoint_file = args.load
+        print(f"Trying to resume from {checkpoint_file}")
+        try:
+            model= VPRModel.load_from_checkpoint(
+                checkpoint_file, **model_args, strict=False)
+            print(f"Resuming training from {checkpoint_file}")
+        except FileNotFoundError:
+            print(f"Checkpoint file {checkpoint_file} not found. Starting from scratch.")
+            # if the checkpoint file does not exist, throw an error
+            raise FileNotFoundError(f"Checkpoint file {checkpoint_file} not found.")
+    else:
+        model = VPRModel(**model_args)
+
+
     print(model)
     # model params saving using Pytorch Lightning
     # we save the best 3 models accoring to Recall@1 on pittsburg val

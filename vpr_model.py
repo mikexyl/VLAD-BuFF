@@ -310,6 +310,8 @@ class VPRModel(pl.LightningModule):
             dataloader_idx = 0
         places, _ = batch
         descriptors = self(places)
+        print("places.shape, descriptors.shape, dataloader_idx")
+        print(places.shape, descriptors.shape, dataloader_idx)
         self.val_outputs[dataloader_idx].append(descriptors.detach().cpu())
         return descriptors.detach().cpu()
 

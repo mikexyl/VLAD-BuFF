@@ -17,15 +17,16 @@ cmd = '''
 python train.py
   --aggregation NETVLAD 
   --backbone xfeat 
-  --expName xfeat_conv_upsample_NV_AB
+  --expName xfeat_vit_NV_AB_2
   --antiburst 
   --no_wandb 
   --pl_seed False
-  --batch_size 16
+  --batch_size 32
   --num_workers 12
   --reduce_feature_dims False
   --reduce_token_dims False
   --epochs 100
+  --load /home/xliu0001/vladbuff/logs/logs/xfeat_vit_NV_AB/checkpoints/last-v1.ckpt
 '''
 
 [dependencies]
